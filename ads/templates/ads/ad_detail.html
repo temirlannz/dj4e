@@ -1,0 +1,83 @@
+{% extends "base_bootstrap.html" %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block head %}
+<style>
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.5); /*dim the background*/
+  }
+</style>
+{% endblock head %}
+{% block content %}
+    <!--Picture overlay that appears when the user clicks on the picture-->
+    {% if ad.content_type %}
+        <div
+        id="overlay"
+        class="overlay"
+        style="text-align: center"
+        onclick="document.getElementById('overlay').style.display = 'none';"
+        >
+        <img
+            style="width: 90%; margin-top: 50px; border: 3px solid black"
+            src="{% url 'ads:ad_picture' ad.id %}"
+        />
+        </div>
+    {% endif %}
+    <span style="float: right">
+        ({{ ad.updated_at|naturaltime }})
+        {% if ad.owner == user %}
+            <h4 style="display: inline;"><a href="{% url 'ads:ad_update' ad.id %}"><i class="fa fa-pencil"></i></a></h4>
+            <h4 style="display: inline;"><a href="{% url 'ads:ad_delete' ad.id %}"><i class="fa fa-trash"></i></a></h4>
+        {% endif %}
+    </span>
+    <h1>{{ ad.title }}</h1>
+    <!--Content-->
+    <span style="float: left">
+        <h3>Price: ${{ ad.price|intcomma}}</h3>
+        <p>Tags:
+            {% for tag in ad.tags.all %}
+            <span style="border-radius: 10px;background-color: #4f4f4f;padding: 5px; margin: 5px;">
+                # {{ tag }}
+            </span>
+            {% endfor %}
+        </p>
+        <div style="max-height: 50vh;border: 1px solid #4f4f4f;padding: 5px;overflow: auto;text-align: justify;">
+            <p>{{ ad.text }}</p>
+        </div>
+        <p><a href="{% url 'ads:all' %}">All ads</a></p>
+        <!--Comments-->
+        {% if user.is_authenticated %}
+        <p>
+                <form method="post" action="{% url 'ads:ad_comment_create' ad.id %}">
+                    {% csrf_token %}
+                    {{ comment_form|crispy }}
+                    <input type="submit" value="Submit">
+                    <input type="submit" value="All Ads" onclick="window.location.href='{% url 'ads:all' %}';return false;">
+                </form>
+            </p>
+        {% endif %}
+        {% for comment in comments %}
+        <p>
+            {{ comment.text }} ({{ comment.updated_at|naturaltime }})
+            {% if user == comment.owner %}
+            <a href="{% url 'ads:ad_comment_delete' comment.id %}"><i class="fa fa-trash"></i></a>
+            {% endif %}
+        </p>
+        {% endfor %}
+    </span>
+    <!--Picture on the side of the content-->
+    {% if ad.content_type %}
+        <img
+        style="float: right; max-width: 50%"
+        src="{% url 'ads:ad_picture' ad.id %}"
+        onclick="document.getElementById('overlay').style.display = 'block';"
+        />
+    {% endif %}
+{% endblock %}

@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'favs.apps.FavsConfig',
     'favsql.apps.FavsqlConfig',
     'autos.apps.AutosConfig',
+    "ads.apps.AdsConfig",
     'cats.apps.CatsConfig',
     'usermodel.apps.UsermodelConfig',
     'fetch.apps.FetchConfig',

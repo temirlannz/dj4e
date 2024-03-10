@@ -21,7 +21,7 @@ class BreedView(LoginRequiredMixin, View):
     def get(self, request):
         breed_list = Breed.objects.all()
         context = {"breed_list": breed_list}
-        return render(request, "cats/breed_list.html", context)
+        return render(request, "cats/breed-list.html", context)
 
 
 # Cats CRUD
